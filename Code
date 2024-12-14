@@ -1,0 +1,64 @@
+// Define the pins
+int waterSensorFilter = A0;  // Water level sensor connected to analog pin A0
+int ledPin = 13;     // LED connected to digital pin 13
+int soilSensorPin = A2;
+int relayPin = 7;
+
+// Variables to store sensor value
+int soilSensorValue = 0;
+
+void setup() {
+  // Initialize serial communication at 9600 bits per second
+  Serial.begin(9600);
+  // Initialize the LED pin as an output
+  pinMode(ledPin, OUTPUT);
+  pinMode(soilSensorPin, INPUT);
+  pinMode(relayPin, OUTPUT);
+}
+
+void loop() {
+  WaterLevel();
+  SoilSensor();
+}
+
+void SoilSensor() {
+  soilSensorValue = analogRead(soilSensorPin);
+  
+  // Print the sensor value to the Serial Monitor
+  Serial.print("Soil Moisture Value: ");
+  Serial.println(soilSensorValue);
+  
+  // Check if the soil is dry
+  if (soilSensorValue > 950) {
+    Serial.print("Dry\n");
+    digitalWrite(relayPin, HIGH);
+  } 
+  else if (soilSensorValue >= 400 && soilSensorValue <= 950){
+    Serial.print("Kinda Wet\n");
+    digitalWrite(relayPin, LOW);
+  }
+  else if (soilSensorValue < 400) {
+    Serial.print("Wet\n");
+  }
+  
+  // Wait for a second before taking another reading
+  delay(1000);
+}
+
+void WaterLevel() {
+  int sensorValueFilter = analogRead(waterSensorFilter);
+
+  // Print out the value you read
+  Serial.print("Water Level Filter: ");
+  Serial.println(sensorValueFilter);
+
+  // Check if the water level is above a threshold
+  if (sensorValueFilter > 200) {  // Adjust the threshold as necessary
+    digitalWrite(ledPin, HIGH);  // Turn the LED on
+  } else {
+    digitalWrite(ledPin, LOW);   // Turn the LED off
+  }
+
+  // Wait for a second before taking the next reading
+  delay(1000);
+}
